@@ -27,5 +27,6 @@ jobs:
           key: vi-dependencies-{{ checksum "package.json" }}
 
       # run tests!
+      - run: sleep 11m
       - run: npm test
       - run: echo Hello Pluralsight
