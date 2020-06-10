@@ -1,42 +1,30 @@
 version: 2
+
 jobs:
   build:
     docker:
       - image: circleci/node:7.10
+    
     working_directory: ~/repo
+    
     steps:
-      - run: echo build step
+      - checkout
 
-  test:
-    docker:
-      - image: circleci/node:7.10
-    working_directory: ~/repo
-    steps:
-      - run: echo test step
+    
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - vi-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-depemdencies-
 
-  deploy:
-    docker:
-      - image: circleci/node:7.10
-    working_directory: ~/repo
-    steps:
-      - run: echo deploy step
+      - run: npm install
 
-workflows:
-  version: 2
-  build-and-test:
-    jobs:
-      - build
-      - test:
-          requires:
-            - build
-      - hold:
-          type: approval
-          requires:
-            - test
-      - deploy:
-          requires:
-            - hold
-          filters:
-            branches:
-              only:
-                - master
+      - save_cache:
+          paths:
+            - node_modules
+          key: vi-dependencies-{{ checksum "package.json" }}
+
+      # run tests!
+      - run: npm test
+      - run: echo Hello Pluralsight
